@@ -20,25 +20,25 @@ The quick start gives very basic example of running client and server on the sam
 >  * JDK 1.7 or above
 >  * A java-based project management software like [Maven][maven] or [Gradle][gradle]
 
-1. Add dependency to pom
+1. Add dependencies to pom.
 
    ```xml
     <dependency>
         <groupId>com.weibo</groupId>
         <artifactId>motan-core</artifactId>
-        <version>0.0.1</version>
+        <version>0.1.0</version>
     </dependency>
     <dependency>
         <groupId>com.weibo</groupId>
         <artifactId>motan-transport-netty</artifactId>
-        <version>0.0.1</version>
+        <version>0.1.0</version>
     </dependency>
-
+    
     <!-- dependencies blow were only needed for spring-based features -->
     <dependency>
         <groupId>com.weibo</groupId>
         <artifactId>motan-springsupport</artifactId>
-        <version>0.0.1</version>
+        <version>0.1.0</version>
     </dependency>
     <dependency>
         <groupId>org.springframework</groupId>
@@ -59,31 +59,22 @@ The quick start gives very basic example of running client and server on the sam
     }
     ```
 
-3. Implement service provider.
-
-
-    `src/main/java/quickstart/FooServiceImpl.java`
+3. Write an implementation, create and start RPC Server.
+    
+    `src/main/java/quickstart/FooServiceImpl.java`  
     
     ```java
     package quickstart;
-    
-    import org.springframework.context.ApplicationContext;
-    import org.springframework.context.support.ClassPathXmlApplicationContext;
-    
+
     public class FooServiceImpl implements FooService {
-    
-        public String hello(String name) {
+
+    	public String hello(String name) {
             System.out.println(name + " invoked rpc service");
             return "hello " + name;
-        }
-    
-        public static void main(String[] args) throws InterruptedException {
-            ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:motan_server.xml");
-            System.out.println("server start...");
-        }
+    	}
     }
     ```
-    
+
     `src/main/resources/motan_server.xml`
     
     ```xml
@@ -101,9 +92,26 @@ The quick start gives very basic example of running client and server on the sam
     </beans>
     ```
     
-    Execute main function in FooServiceImpl will start a motan server listening on port 8002.
+    `src/main/java/quickstart/Server.java`
+    
+    ```java
+    package quickstart;
+    
+    import org.springframework.context.ApplicationContext;
+    import org.springframework.context.support.ClassPathXmlApplicationContext;
+    
+    public class Server {
+    
+        public static void main(String[] args) throws InterruptedException {
+            ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:motan_server.xml");
+            System.out.println("server start...");
+        }
+    }
+    ```
+    
+    Execute main function in Server will start a motan server listening on port 8002.
 
-4. The service consumer
+4. Create and start RPC Client.
 
     `src/main/resources/motan_client.xml`
 
@@ -140,7 +148,7 @@ The quick start gives very basic example of running client and server on the sam
     ```
     
     Execute main function in Client will invoke the remote service and print response.
-
+    
 
 # Documents
 
@@ -153,7 +161,7 @@ The quick start gives very basic example of running client and server on the sam
 * fishermen([@hustfisher](https://github.com/hustfisher))
 * TangFulin([@tangfl](https://github.com/tangfl))
 * bodlyzheng([@bodlyzheng](https://github.com/bodlyzheng))
-* wangyu1
+* jacawang([@jacawang](https://github.com/jacawang))
 * zenglingshu([@zenglingshu](https://github.com/zenglingshu))
 * Sugar Zouliu([@lamusicoscos](https://github.com/lamusicoscos))
 * tangyang([@tangyang](https://github.com/tangyang))
@@ -161,6 +169,7 @@ The quick start gives very basic example of running client and server on the sam
 * jackael([@jackael9856](https://github.com/jackael9856))
 * Ray([@rayzhang0603](https://github.com/rayzhang0603))
 * r2dx([@half-dead](https://github.com/half-dead))
+* Jake Zhang([sunnights](https://github.com/sunnights))
 * axb([@qdaxb](https://github.com/qdaxb))
 * wenqisun([@wenqisun](https://github.com/wenqisun))
 * fingki([@fingki](https://github.com/fingki))

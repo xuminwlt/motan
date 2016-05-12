@@ -12,25 +12,26 @@ The quick start gives very basic example of running server and client on the sam
 
 ## <a id="peer-to-peer"></a>Using Motan in single machine environment
 
-1. Add dependency to pom.
+
+1. Add dependencies to pom.
 
    ```xml
     <dependency>
         <groupId>com.weibo</groupId>
         <artifactId>motan-core</artifactId>
-        <version>0.0.1</version>
+        <version>0.1.0</version>
     </dependency>
     <dependency>
         <groupId>com.weibo</groupId>
         <artifactId>motan-transport-netty</artifactId>
-        <version>0.0.1</version>
+        <version>0.1.0</version>
     </dependency>
     
-    <!-- only needed for spring-based features -->
+    <!-- dependencies blow were only needed for spring-based features -->
     <dependency>
         <groupId>com.weibo</groupId>
         <artifactId>motan-springsupport</artifactId>
-        <version>0.0.1</version>
+        <version>0.1.0</version>
     </dependency>
     <dependency>
         <groupId>org.springframework</groupId>
@@ -51,31 +52,22 @@ The quick start gives very basic example of running server and client on the sam
     }
     ```
 
-3. Implement the service provider.
-
-
-    `src/main/java/quickstart/FooServiceImpl.java`
+3. Write an implementation, create and start RPC Server.
+    
+    `src/main/java/quickstart/FooServiceImpl.java`  
     
     ```java
     package quickstart;
-    
-    import org.springframework.context.ApplicationContext;
-    import org.springframework.context.support.ClassPathXmlApplicationContext;
-    
+
     public class FooServiceImpl implements FooService {
-    
-        public String hello(String name) {
+
+    	public String hello(String name) {
             System.out.println(name + " invoked rpc service");
             return "hello " + name;
-        }
-    
-        public static void main(String[] args) throws InterruptedException {
-            ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:motan_server.xml");
-            System.out.println("server start...");
-        }
+    	}
     }
     ```
-    
+
     `src/main/resources/motan_server.xml`
     
     ```xml
@@ -88,14 +80,31 @@ The quick start gives very basic example of running server and client on the sam
 
         <!-- service implemention bean -->
         <bean id="serviceImpl" class="quickstart.FooServiceImpl" />
-        <!-- exporting service by motan -->
+        <!-- exporting service by Motan -->
         <motan:service interface="quickstart.FooService" ref="serviceImpl" export="8002" />
     </beans>
     ```
     
-	Executing main function in FooServiceImpl will start a motan server listening on port 8002.
+    `src/main/java/quickstart/Server.java`
+    
+    ```java
+    package quickstart;
+    
+    import org.springframework.context.ApplicationContext;
+    import org.springframework.context.support.ClassPathXmlApplicationContext;
+    
+    public class Server {
+    
+        public static void main(String[] args) throws InterruptedException {
+            ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:motan_server.xml");
+            System.out.println("server start...");
+        }
+    }
+    ```
+    
+    Execute main function in Server will start a Motan server listening on port 8002.
 
-4. Implement the service consumer.
+4. Create and start RPC Client.
 
     `src/main/resources/motan_client.xml`
 
@@ -131,12 +140,11 @@ The quick start gives very basic example of running server and client on the sam
     }
     ```
     
-	Executing main function in Client will invoke the remote service and print response.
-    
+    Execute main function in Client will invoke the remote service and print response.
     
 ## <a id="cluster"></a>Using Motan in cluster environment
 
-In cluster environment, the external service discovery components such as Consul or ZooKeeper is needed to support the use of motan.
+In cluster environment, the external service discovery components such as Consul or ZooKeeper is needed to support the use of Motan.
 
 
 ### <a id="consul"></a>Using Consul as registry
@@ -165,7 +173,7 @@ UI backend [http://localhost:8500/ui](http://localhost:8500/ui)
     <dependency>
         <groupId>com.weibo</groupId>
         <artifactId>motan-registry-consul</artifactId>
-        <version>0.0.1</version>
+        <version>0.1.0</version>
     </dependency>
     ```
 
@@ -189,11 +197,10 @@ UI backend [http://localhost:8500/ui](http://localhost:8500/ui)
     <motan:referer id="remoteService" interface="quickstart.FooService" registry="my_consul"/>
     ```
 
-
-4. After the server starts, you need to call the hearbeat switch explicitly in order to register in Consul.
+4. After the server starts, you SHOULD call heartbeat switcher explicitly in order to start heartbeat for Consul.
 
     ```java
-    MotanSwitcherUtil.setSwitcher(ConsulConstants.NAMING_PROCESS_HEARTBEAT_SWITCHER, true)
+    MotanSwitcherUtil.setSwitcherValue(MotanConstants.REGISTRY_HEARTBEAT_SWITCHER, true)
     ```
 
 5. Go to [UI backend](http://localhost:8500/ui). Verify whether the service is normal.
@@ -223,7 +230,7 @@ Install and start ZooKeeper:
     <dependency>
         <groupId>com.weibo</groupId>
         <artifactId>motan-registry-zookeeper</artifactId>
-        <version>0.0.1</version>
+        <version>0.1.0</version>
     </dependency>
     ```
 
@@ -255,7 +262,13 @@ Install and start ZooKeeper:
     <motan:referer id="remoteService" interface="quickstart.FooService" registry="my_zookeeper"/>
     ```
 
-4. Start client, call service.
+4. After the server starts, you SHOULD call heartbeat switcher explicitly in order to start heartbeat for Zookeeper.
+
+    ```java
+    MotanSwitcherUtil.setSwitcherValue(MotanConstants.REGISTRY_HEARTBEAT_SWITCHER, true)
+    ```
+
+5. Start client, call service.
 
 
 [maven]:https://maven.apache.org

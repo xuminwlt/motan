@@ -21,7 +21,7 @@
 
 
 # 基本介绍
-Motan是一套基于java开发的RPC框架，除了常规的点对点调用外，motan还提供服务治理功能，包括服务节点的自动发现、摘除、高可用和负载均衡等。Motan具有良好的扩展性，主要模块都提供了多种不同的实现，例如支持多种注册中心，支持多种rpc协议等。
+Motan是一套基于java开发的RPC框架，除了常规的点对点调用外，Motan还提供服务治理功能，包括服务节点的自动发现、摘除、高可用和负载均衡等。Motan具有良好的扩展性，主要模块都提供了多种不同的实现，例如支持多种注册中心，支持多种rpc协议等。
 
 ## 架构概述
 
@@ -62,7 +62,7 @@ Client端使用的模块，cluster是一组可用的Server在逻辑上的封装�
 ## 配置概述
 Motan框架中将功能模块抽象为四个可配置的元素，分别为：
 
-- protocol：服务通信协议。服务提供方与消费方进行远程调用的协议，默认为motan协议，使用hessian2进行序列化，netty作为Endpoint以及使用motan自定义的协议编码方式。
+- protocol：服务通信协议。服务提供方与消费方进行远程调用的协议，默认为Motan协议，使用hessian2进行序列化，netty作为Endpoint以及使用Motan自定义的协议编码方式。
 
 - registry：注册中心。服务提供方将服务信息（包含ip、端口、服务策略等信息）注册到注册中心，服务消费方通过注册中心发现服务。当服务发生变更，注册中心负责通知各个消费方。
 
@@ -82,7 +82,7 @@ Motan推荐使用spring配置rpc服务，目前Motan扩展了6个自定义Spring
 每种标签的详细含义请参考后文[配置说明](#config)部分。全部参数清单请参考[配置清单](zh_configuration)。
 
 # 使用Motan
-Motan主要使用Spring进行配置，业务代码无需修改。关于在项目中使用Motan框架的具体步骤，请参考：[快速入门](quickstart)。
+Motan主要使用Spring进行配置，业务代码无需修改。关于在项目中使用Motan框架的具体步骤，请参考：[快速入门](zh_quickstart)。
 
 在使用Motan框架时，除了配置之外还需要注意工程依赖及Motan框架本身的异常处理。
 
@@ -122,13 +122,13 @@ Motan框架采用模块化设计，使用时可以按需依赖。目前的模块
 
 Protocol用来配置Motan服务的协议。不同的服务适用不同的协议进行传输，可以自行扩展协议。
 
-### motan协议
+### Motan协议
 
 ```xml
 <motan:protocol name="motan" />
 ```
 
-Motan默认的rpc协议为motan协议，使用tcp长连接模式，基于netty通信。
+Motan默认的rpc协议为Motan协议，使用tcp长连接模式，基于netty通信。
 
 
 #### 负载均衡
@@ -272,10 +272,9 @@ Motan支持使用多种Registry模块，使用不同注册中心需要依赖对�
 
 * interface：标识服务的接口类名
 * ref：标识服务的实现类，引用具体的spring业务实现对象
-* export：标识服务的暴露方式，格式为“protocolId:port”（使用的协议及对外提供的端口号），其中protocolId：应与motan:protocol中的name一致
+* export：标识服务的暴露方式，格式为“protocolId:port”（使用的协议及对外提供的端口号），其中protocolId：应与motan:protocol中的id一致
 * group：标识服务的分组
 * module：标识模块信息	
-* protocol：标识service使用的协议，与motan:protocol中的name对应，默认为motan协议
 * basicService：标识使用的基本配置，引用motan:basicService对象
 
 Motan在注册中心的服务是以group的形式保存的，一般推荐一个分组以机房＋业务线进行命名，如yf-user-rpc。一个分组中包含若干的Service，一个Service即是java中的一个接口类名，每个Service下有一组能够提供对应服务的Server。
@@ -290,20 +289,18 @@ Motan在注册中心的服务是以group的形式保存的，一般推荐一个�
 rpc服务的通用配置，用于配置所有服务接口的公共配置，减少配置冗余。basicService包含以下常用属性：
 
 * id：标识配置项
-* export：标识服务的暴露方式，格式为“protocolId:port”（使用的协议及对外提供的端口号），其中protocolId：应与motan:protocol中的name对应
+* export：标识服务的暴露方式，格式为“protocolId:port”（使用的协议及对外提供的端口号），其中protocolId：应与motan:protocol中的id一致
 * group：标识服务的分组
 * module：标识模块信息
-* protocol：标识service使用的协议，与motan:protocol中的name对应，默认为motan协议
 * registry：标识service使用的注册中心，与motan:registry中的name对应
 
 motan:service可以通过以下方式引用基本配置。
 
 ```
 <!-- 通用配置，多个rpc服务使用相同的基础配置. group和module定义具体的服务池。export格式为“protocol id:提供服务的端口” -->
-<motan:basicService id="serviceBasicConfig" export="demoMotan:8002" group="motan-demo-rpc" module="motan-demo-rpc" registry="registry" protocol="motan"/>
+<motan:basicService id="serviceBasicConfig" export="demoMotan:8002" group="motan-demo-rpc" module="motan-demo-rpc" registry="registry"/>
 <!-- 通用配置，多个rpc服务使用相同的基础配置. group和module定义具体的服务池。export格式为“protocol id:提供服务的端口” -->
-<motan:service interface="com.weibo.motan.demo.service.MotanDemoService"
-                   ref="demoServiceImpl" basicService="serviceBasicConfig"/>
+<motan:service interface="com.weibo.motan.demo.service.MotanDemoService" ref="demoServiceImpl" basicService="serviceBasicConfig"/>
 ```
 
 motan:service中的basicService属性用来标识引用哪个motan:basicService对象，对于basicService中已定义的内容，service不必重复配置。
@@ -318,7 +315,7 @@ motan:service中的basicService属性用来标识引用哪个motan:basicService�
 * id：标识配置项
 * group：标识服务的分组
 * module：标识模块信息
-* protocol：标识referer使用的协议，与motan:protocol中的name对应，默认为motan协议
+* protocol：标识referer使用的协议，与motan:protocol中的name对应，默认为Motan协议
 * registry：标识referer使用的注册中心，与motan:registry中的name对应
 * basicReferer：标识使用的基本配置，引用motan:basicReferer对象
 
@@ -333,7 +330,7 @@ Client端订阅Service后，会从Registry中得到能够提供对应Service的�
 * id：标识配置项
 * group：标识服务的分组
 * module：标识模块信息
-* protocol：标识referer使用的协议，与motan:protocol中的name对应，默认为motan协议
+* protocol：标识referer使用的协议，与motan:protocol中的name对应，默认为Motan协议
 * registry：标识referer使用的注册中心，与motan:registry中的name对应
 
 motan:referer可以通过以下方式引用基本配置。
@@ -352,15 +349,13 @@ motan:referer中的basicService属性用来标识引用哪个motan:basicReferer�
 
 # 运维及监控
 ## 优雅的停止服务
-Motan支持在Consul集群环境下优雅的关闭节点，当需要关闭或重启节点时，可以先将待上线节点从集群中摘除，避免直接关闭影响正常请求。
+Motan支持在Consul、ZooKeeper集群环境下优雅的关闭节点，当需要关闭或重启节点时，可以先将待上线节点从集群中摘除，避免直接关闭影响正常请求。
 
 待关闭节点需要调用以下代码，建议通过servlet或业务的管理模块进行该调用。
 
 ```java
-MotanSwitcherUtil.setSwitcher(ConsulConstants.NAMING_PROCESS_HEARTBEAT_SWITCHER, false)
+MotanSwitcherUtil.setSwitcherValue(MotanConstants.REGISTRY_HEARTBEAT_SWITCHER, true)
 ```
-
-> 注意：Zookeeper模块此功能正在开发。
 
 ## 管理后台
 管理后台主要包括RPC服务查询、流量切换、Motan指令设置等功能，需使用ZooKeeper作为注册中心
